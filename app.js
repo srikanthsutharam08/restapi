@@ -98,7 +98,7 @@ bot.on('contactRelationUpdate', function (message) {
 		profileInfo["name"] = name;
         var reply = new builder.Message()
                 .address(message.address)
-                .text("Hello %s... Thanks for adding me into your contacts.Say something for your information.", JSON.stringify(message) || 'there');
+                .text("Hello %s, %s... Thanks for adding me into your contacts.Say something for your information.", name, JSON.stringify(message.user.id) || 'there');
         bot.send(reply);
     } else {
         // delete their data
