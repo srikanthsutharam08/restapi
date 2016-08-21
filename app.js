@@ -141,6 +141,7 @@ function createProfileInfo(profileInfo) {
 	connection.end();
 }
 
+//Save the userdata in SQL DB
 function saveProfileInfo() {  
     var request = new Request("INSERT into dbo.userinfo(user_id, user_name, age, gender, maritalstatus, city) values (@user_id, @name, @age, @gender, @maritalstatus, @city);", function(err) {  
 		if (err) {  
@@ -164,6 +165,7 @@ function saveProfileInfo() {
         connection.execSql(request);	
 }
 
+//Delete the userdata from DB
 function deleteProfileInfo(userId) {  
     var request = new Request("delete from dbo.userinfo where user_id = @user_id;", function(err) {  
 		if (err) {  
