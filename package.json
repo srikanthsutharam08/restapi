@@ -1,0 +1,22 @@
+{
+  "name": "restapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "botbuilder": "^3.2.3",
+    "events": "^1.1.1",
+    "mysql": "^2.11.1",
+    "restify": "^4.1.1",
+    "sequelize": "^3.24.1",
+    "skype-sdk": "^1.0.6",
+    "tedious": "^1.14.0",
+    "util": "^0.10.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
