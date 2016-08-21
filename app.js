@@ -1,12 +1,7 @@
 var restify = require("restify");
 var builder = require("botbuilder");
-var Sequelize = require('sequelize');
 var mysql = require('mysql');
 var tedious = require('tedious')
-
-//var env = process.env.NODE_ENV || 'development';
-//var dbconfig = require('./config/dbconfig.json')[env];
-//var sequelize = new Sequelize(dbconfig.database, dbconfig.username, dbconfig.password, dbconfig);
 
 //-----------------
 // local mysql DB
@@ -18,6 +13,7 @@ var tedious = require('tedious')
 //  database : 'botdb'
 //});
 //connection.connect();
+
 //----------------------
 //Connect to Azure mysql database
 //----------------------
@@ -131,15 +127,6 @@ bot.dialog('/', [
 	}
 ]);
 
-function createProfileInfo(profileInfo) {
-	var post = {user_id:profileInfo["user_id"], user_name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], maritalstatus:profileInfo["maritalstatus"], city:profileInfo["city"]};	
-	var query = connection.query('INSERT INTO userinfo SET ?', post, function(err, result) {
-		if (err) 
-			throw err;
-	});
-	console.log(query.sql);  
-	connection.end();
-}
 
 //Save the userdata in SQL DB
 function saveProfileInfo() {  
