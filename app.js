@@ -103,7 +103,7 @@ bot.on('contactRelationUpdate', function (message) {
                 .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
         bot.send(reply);
     } else {
-        // delete their data
+        deleteProfileInfo(message.user.id)
     }
 });
 
@@ -161,5 +161,14 @@ function saveProfileInfo() {
               }  
             });  
         });       
+        connection.execSql(request);	
+}
+
+function deleteProfileInfo(userId) {  
+    var request = new Request("delete from dbo.userinfo where user_id = @user_id;", function(err) {  
+		if (err) {  
+			console.log(err);}  
+        });  
+		request.addParameter('user_id', TYPES.NVarChar, userId);       
         connection.execSql(request);	
 }
