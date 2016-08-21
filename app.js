@@ -95,10 +95,12 @@ bot.on('conversationUpdate', function (message) {
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
         var name = message.user ? message.user.name : null;
+		var user_id = message.user.id
 		profileInfo["name"] = name;
+		profileInfo["user_id"] = user_id;
         var reply = new builder.Message()
                 .address(message.address)
-                .text("Hello %s, %s... Thanks for adding me into your contacts.Say something for your information.", name, JSON.stringify(message.user.id) || 'there');
+                .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
         bot.send(reply);
     } else {
         // delete their data
@@ -130,7 +132,7 @@ bot.dialog('/', [
 ]);
 
 function createProfileInfo(profileInfo) {
-	var post = {name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], maritalstatus:profileInfo["maritalstatus"], city:profileInfo["city"]};	
+	var post = {user_id:profileInfo["user_id"], user_name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], maritalstatus:profileInfo["maritalstatus"], city:profileInfo["city"]};	
 	var query = connection.query('INSERT INTO userinfo SET ?', post, function(err, result) {
 		if (err) 
 			throw err;
@@ -140,10 +142,11 @@ function createProfileInfo(profileInfo) {
 }
 
 function saveProfileInfo() {  
-    var request = new Request("INSERT into dbo.userinfo(name, age, gender, maritalstatus, city) values (@name, @age, @gender, @maritalstatus, @city);", function(err) {  
+    var request = new Request("INSERT into dbo.userinfo(user_id, user_name, age, gender, maritalstatus, city) values (@user_id, @name, @age, @gender, @maritalstatus, @city);", function(err) {  
 		if (err) {  
 			console.log(err);}  
         });  
+		request.addParameter('user_id', TYPES.NVarChar, profileInfo["user_id"]);
         request.addParameter('name', TYPES.NVarChar, profileInfo["name"]);
 		request.addParameter('age', TYPES.Int, profileInfo["age"]); 		
         request.addParameter('gender', TYPES.NVarChar , profileInfo["gender"]);  
