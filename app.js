@@ -108,7 +108,7 @@ bot.on('contactRelationUpdate', function (message) {
 bot.dialog('/', [
 	function(session) {
 		if(profileInfo["age"]) {
-			session.send("profile already created")
+			session.send(JSON.stringify(profileInfo))
 		} else {
 			session.beginDialog('/profileInfo')
 		}
