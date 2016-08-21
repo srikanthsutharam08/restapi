@@ -103,10 +103,22 @@ bot.on('contactRelationUpdate', function (message) {
     }
 });
 
+
+// Bot Dialogs
 bot.dialog('/', [
 	function(session) {
+		if(profileInfo["user_id"]) {
+			session.send("profile already created")
+		} else {
+			session.beginDialog('/profileInfo')
+		}
+    }
+]);
+
+bot.dialog('/profileInfo', [
+	function(session) {
 		builder.Prompts.number(session, 'What is your age?');
-    },
+	},
 	function(session, results) {
 		profileInfo["age"] = results.response;
 		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
@@ -125,7 +137,7 @@ bot.dialog('/', [
 		saveProfileInfo();
 		session.endDialog(JSON.stringify(profileInfo));
 	}
-]);
+])
 
 
 //Save the userdata in SQL DB
