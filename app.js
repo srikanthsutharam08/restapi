@@ -135,7 +135,6 @@ bot.dialog('/profileInfo', [
 	function (session, results) {
 		profileInfo["city"] = results.response; 
 		saveUserInfo(profileInfo)
-		deleteUserInfo(profileInfo["user_id"])
 		//saveProfileInfo();
 		session.endDialog(JSON.stringify(profileInfo));
 	}
