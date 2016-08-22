@@ -125,11 +125,11 @@ bot.dialog('/profileInfo', [
 		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
     },
 	function (session, results) {
-		profileInfo["gender"] = results.response;
+		profileInfo["gender"] = results.response.entity;
 		builder.Prompts.confirm(session, "Are you Married?");
 	},
     function(session, results) {
-		profileInfo["maritalstatus"] = results.response.entity;
+		profileInfo["maritalstatus"] = results.response;
 		builder.Prompts.text(session, "What is your email address?");
 	}, 
     function (session, results) {
