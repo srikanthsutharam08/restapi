@@ -154,7 +154,7 @@ function saveUserInfo(profileInfo) {
 
 //Delete userinfo in SQL DB
 function deleteUserInfo(user_id) {
- 	var post = {user_id:profileInfo["user_id"]};	
+ 	var post = {user_id:user_id};	
  	var query = connection.query('delete from userinfo where ?', post, function(err, result) {
  		if (err) 
  			throw err;
