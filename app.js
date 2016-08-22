@@ -4,34 +4,34 @@ var mysql = require('mysql');
 var tedious = require('tedious')
 
 //-----------------
-// local mysql DB
+// Azure mysql DB
 //-----------------
-//var connection = mysql.createConnection({
-//  host     : 'botdbserver.database.windows.net',
-//  user     : 'root',
-//  password : 'SbsUrrTai@#345',
-//  database : 'botdb'
-//});
-//connection.connect();
+var connection = mysql.createConnection({
+  host     : 'us-cdbr-azure-west-c.cloudapp.net',
+  user     : 'b53b72110e4c63',
+  password : '38210b5d',
+  database : 'acsm_b33ab7b73a67497'
+});
+connection.connect();
 
 //----------------------
-//Connect to Azure mysql database
+//Connect to Azure sql server database
 //----------------------
-var Connection = require('tedious').Connection;
-var Request = require('tedious').Request;  
-var TYPES = require('tedious').TYPES;
-var config = {  
-        userName: 'srikanthsutharam08',  
-        password: 'SbsUrrTai@#345',  
-        server: 'botdbserver.database.windows.net',  
-        // When you connect to Azure SQL Database, you need these next options.  
-        options: {encrypt: true, database: 'botdb'}  
-    };  
-var connection = new Connection(config);  
-connection.on('connect', function(err) {  
+//var Connection = require('tedious').Connection;
+//var Request = require('tedious').Request;  
+//var TYPES = require('tedious').TYPES;
+//var config = {  
+//        userName: 'srikanthsutharam08',  
+//        password: 'SbsUrrTai@#345',  
+//       server: 'botdbserver.database.windows.net',  
+//        // When you connect to Azure SQL Database, you need these next options.  
+//        options: {encrypt: true, database: 'botdb'}  
+//    };  
+//var connection = new Connection(config);  
+//connection.on('connect', function(err) {  
     // If no error, then good to proceed.  
-    console.log("Connected");
-});
+//    console.log("Connected");
+//});
 //----------------------
 
 //=========================================================
@@ -99,7 +99,8 @@ bot.on('contactRelationUpdate', function (message) {
                 .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
         bot.send(reply);
     } else {
-        deleteProfileInfo(message.user.id)
+        //deleteProfileInfo(message.user.id)
+		deleteUserInfo(message.user.id)
     }
 });
 
@@ -133,14 +134,36 @@ bot.dialog('/profileInfo', [
 	},
 	function (session, results) {
 		profileInfo["city"] = results.response; 
-		//createProfileInfo(profileInfo)
-		saveProfileInfo();
+		saveUserInfo(profileInfo)
+		deleteUserInfo(profileInfo["user_id"])
+		//saveProfileInfo();
 		session.endDialog(JSON.stringify(profileInfo));
 	}
 ])
 
+//Save userinfo in SQL DB
+function saveUserInfo(profileInfo) {
+ 	var post = {user_id:profileInfo["user_id"], user_name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], maritalstatus:profileInfo["maritalstatus"], city:profileInfo["city"]};	
+ 	var query = connection.query('INSERT INTO userinfo SET ?', post, function(err, result) {
+ 		if (err) 
+ 			throw err;
+ 	});
+ 	console.log(query.sql);  
+ 	connection.end();
+}
 
-//Save the userdata in SQL DB
+//Delete userinfo in SQL DB
+function deleteUserInfo(user_id) {
+ 	var post = {user_id:profileInfo["user_id"]};	
+ 	var query = connection.query('delete from userinfo where ?', post, function(err, result) {
+ 		if (err) 
+ 			throw err;
+ 	});
+ 	console.log(query.sql);  
+ 	connection.end();
+}
+
+//Save the userdata in SQL server DB
 function saveProfileInfo() {  
     var request = new Request("INSERT into dbo.userinfo(user_id, user_name, age, gender, maritalstatus, city) values (@user_id, @name, @age, @gender, @maritalstatus, @city);", function(err) {  
 		if (err) {  
@@ -164,7 +187,7 @@ function saveProfileInfo() {
         connection.execSql(request);	
 }
 
-//Delete the userdata from DB
+//Delete the userdata in SQL server DB
 function deleteProfileInfo(userId) {  
     var request = new Request("delete from dbo.userinfo where user_id = @user_id;", function(err) {  
 		if (err) {  
