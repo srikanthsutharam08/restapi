@@ -147,7 +147,7 @@ bot.dialog('/profileInfo', [
 
 //Save userinfo in SQL DB
 function saveUserInfo(profileInfo) {
- 	var post = {user_id:profileInfo["user_id"], user_name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], maritalstatus:profileInfo["maritalstatus"], email:profileInfo["email"], city:profileInfo["city"]};	
+ 	var post = {user_id:profileInfo["user_id"], user_name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], email:profileInfo["email"], maritalstatus:profileInfo["maritalstatus"], city:profileInfo["city"]};	
  	var query = connection.query('INSERT INTO userinfo SET ?', post, function(err, result) {
  		if (err) 
  			throw err;
