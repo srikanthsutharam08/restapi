@@ -118,7 +118,7 @@ bot.dialog('/profileInfo', [
 			session.beginDialog('/gatherProfileInfo')
 		} else {
 			if(profileInfo[user_id]["infoGathered"]) {
-				session.send(JSON.stringify(profileInfo))
+				session.send(JSON.stringify(profileInfo[user_id]))
 			} else {
 				session.beginDialog('/gatherProfileInfo')
 			}
