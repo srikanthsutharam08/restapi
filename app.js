@@ -148,9 +148,8 @@ bot.dialog('/gatherProfileInfo', [
 	},
 	function (session, results) {
 		profileInfo[session.message.user.id]["city"] = results.response; 
-		profileInfo[session.message.user.id]["infoGathered"] = true;
+		profileInfo[session.message.user.id]["infoGathered"] = "true";
 		//saveUserInfo(profileInfo[session.message.user.id])
-		//saveProfileInfo();
 		session.endDialog(JSON.stringify(profileInfo));
 	}
 ])
