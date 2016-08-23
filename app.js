@@ -97,7 +97,7 @@ bot.on('contactRelationUpdate', function (message) {
         var reply = new builder.Message()
                 .address(message.address)
                 .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
-        bot.send(reply);
+        //bot.send(reply);
 		builder.DialogAction.beginDialog('/')
     } else {
         //deleteProfileInfo(message.user.id)
