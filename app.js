@@ -117,7 +117,11 @@ bot.dialog('/profileInfo', [
 			profileInfo[user_id] = {}
 			session.beginDialog('/gatherProfileInfo')
 		} else {
-			session.send(JSON.stringify(profileInfo))
+			if(profileInfo[user_id]["infoGathered"]) {
+				session.send(JSON.stringify(profileInfo))
+			} else {
+				session.beginDialog('/gatherProfileInfo')
+			}
 		}
 	}
 ])
@@ -144,6 +148,7 @@ bot.dialog('/gatherProfileInfo', [
 	},
 	function (session, results) {
 		profileInfo[session.message.user.id]["city"] = results.response; 
+		profileInfo[session.message.user.id]["infoGathered"] = true;
 		//saveUserInfo(profileInfo[session.message.user.id])
 		//saveProfileInfo();
 		session.endDialog(JSON.stringify(profileInfo));
