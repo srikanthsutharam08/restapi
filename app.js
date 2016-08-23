@@ -45,7 +45,6 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 
 var profileInfo = {}
-var name = null;
 // Create chat bot
 var botConnectorOptions = { 
     appId: process.env.BOTFRAMEWORK_APPID, 
@@ -97,8 +96,7 @@ bot.on('contactRelationUpdate', function (message) {
         var reply = new builder.Message()
                 .address(message.address)
                 .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
-        //bot.send(reply);
-		builder.DialogAction.beginDialog('/')
+        bot.send(reply);
     } else {
         //deleteProfileInfo(message.user.id)
 		deleteUserInfo(message.user.id)
@@ -109,6 +107,7 @@ bot.on('contactRelationUpdate', function (message) {
 // Bot Dialogs
 bot.dialog('/', [
 	function(session) {
+		session.send(session)
 		if(profileInfo["age"]) {
 			session.send(JSON.stringify(profileInfo))
 		} else {
