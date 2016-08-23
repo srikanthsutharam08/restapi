@@ -91,9 +91,8 @@ bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
         var name = message.user ? message.user.name : null;
 		var user_id = message.user.id
-		profileInfo["name"] = name;
-		profileInfo["user_id"] = user_id;
-        var reply = new builder.Message()
+		profileInfo[user_id] = {"user_id": user_id, "name":name}
+		var reply = new builder.Message()
                 .address(message.address)
                 .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
         bot.send(reply);
@@ -106,35 +105,46 @@ bot.on('contactRelationUpdate', function (message) {
 
 // Bot Dialogs
 bot.dialog('/', [
-	function(session, results) {
-		session.send(results.response)
-		if(profileInfo["age"]) {
-			session.send(JSON.stringify(profileInfo))
-		} else {
-			session.beginDialog('/profileInfo')
-		}
+	function(session) {
+		session.beginDialog('/profileInfo')
     }
 ]);
 
 bot.dialog('/profileInfo', [
 	function(session) {
+		var user_id = session.message.user.id
+		if(!profileInfo[user_id]) {
+			profileInfo[user_id] = {}
+			session.beginDialog('/gatherProfileInfo')
+		} else {
+			session.send(JSON.stringify(profileInfo))
+		}
+	}
+])
+
+bot.dialog('/gatherProfileInfo', [
+	function(session) {
 		builder.Prompts.number(session, 'What is your age?');
 	},
 	function(session, results) {
-		profileInfo["age"] = results.response;
+		profileInfo[session.message.user.id]["age"] = results.response;
 		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
     },
     function(session, results) {
-		profileInfo["gender"] = results.response.entity;
+		profileInfo[session.message.user.id]["gender"] = results.response.entity;
 		builder.Prompts.confirm(session, "Are you Married?");   
 	}, 
     function (session, results) {
-		profileInfo["maritalstatus"] = results.response;
+		profileInfo[session.message.user.id]["maritalstatus"] = results.response;
+		builder.Prompts.text(session, "Please enter your email id?");
+	}, 
+    function (session, results) {
+		profileInfo[session.message.user.id]["email"] = results.response;
 		builder.Prompts.text(session, "What is your current residing city?");
 	},
 	function (session, results) {
-		profileInfo["city"] = results.response; 
-		saveUserInfo(profileInfo)
+		profileInfo[session.message.user.id]["city"] = results.response; 
+		//saveUserInfo(profileInfo[session.message.user.id])
 		//saveProfileInfo();
 		session.endDialog(JSON.stringify(profileInfo));
 	}
