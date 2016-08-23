@@ -106,8 +106,8 @@ bot.on('contactRelationUpdate', function (message) {
 
 // Bot Dialogs
 bot.dialog('/', [
-	function(session) {
-		session.send(session)
+	function(session, results) {
+		session.send(results.response)
 		if(profileInfo["age"]) {
 			session.send(JSON.stringify(profileInfo))
 		} else {
