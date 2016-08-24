@@ -58,8 +58,7 @@ server.post('/api/messages', connector.listen());
 //Sends a proactive message to end users to participate in a survey
 server.get('/proactivesurvey', function respond(req, res, next) {
 	var filteredUsers = filterUsers(profileInfo)
-	var size = filteredUsers.size()
-	for(var i=0; i &lt; size; i++ ) {
+	for(var i=0; i < filteredUsers.size(); i++ ) {
 		bot.beginDialog(filteredUsers[0]["address"], '/notify');
 	}
 	res.send('Sent survey requests to end users');
