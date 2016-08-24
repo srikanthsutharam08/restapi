@@ -55,6 +55,11 @@ var connector = new builder.ChatConnector(botConnectorOptions);
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
+server.get('/proactivesurvey', function respond(req, res, next) {
+	bot.beginDialog(address, '/notify');
+	res.send('hello proactive message is displayed');
+})
+
 //=========================================================
 // Activity Events
 //=========================================================
@@ -156,7 +161,7 @@ bot.dialog('/gatherProfileInfo', [
 	}
 ]);
 
-bot.beginDialog(address, '/notify')
+
 bot.dialog('/notify', function (session) {
    session.endDialog("I'm sending you a proactive message!");
 });
