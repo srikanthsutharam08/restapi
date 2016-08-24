@@ -59,9 +59,9 @@ server.post('/api/messages', connector.listen());
 server.get('/proactivesurvey', function respond(req, res, next) {
 	var filteredUsers = filterUsers(profileInfo)
 	for(var i=0; i < filteredUsers.length; i++ ) {
-		bot.beginDialog(filteredUsers[0]["address"], '/notify');
+		bot.beginDialog(filteredUsers[i].address, '/notify');
 	}
-	res.send('Sent survey requests to end users');
+	res.send('Sent survey requests to end users'+ filteredUsers);
 })
 
 //=========================================================
