@@ -56,8 +56,15 @@ var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
 server.get('/proactivesurvey', function respond(req, res, next) {
-	bot.beginDialog(address, '/notify');
-	res.send('hello ');
+	var filteredUsers = filterUsers(profileInfo)
+	//var filteredUsers = {"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI":{"user_id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB","address":{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"},"age":26,"gender":"Male","maritalstatus":"false","email":"asdf","city":"asdf","infoGathered":"true"}}
+ 	for (var key in filteredUsers) {
+		if (filteredUsers.hasOwnProperty(key)) {
+			console.log(key + " -> " + JSON.stringify(filteredUsers[key]));
+			bot.beginDialog(filteredUsers[key].address, '/notify');
+		}
+	}
+ 	res.send('Sent survey requests to end users');
 })
 
 //=========================================================
@@ -165,6 +172,17 @@ bot.dialog('/gatherProfileInfo', [
 bot.dialog('/notify', function (session) {
    session.endDialog("I'm sending you a proactive message!");
 });
+
+//=========================================================
+// User Functions
+//=========================================================
+
+/**
+Returns list of end users after filtering
+**/
+function filterUsers(profileInfo) {
+	return profileInfo
+}
 
 //Save userinfo in SQL DB
 function saveUserInfo(profileInfo) {
