@@ -128,6 +128,7 @@ bot.dialog('/profileInfo', [
 
 bot.dialog('/gatherProfileInfo', [
 	function(session) {
+		profileInfo[session.message.user.id]["address"] = session.message.address; 
 		builder.Prompts.number(session, 'What is your age?');
 	},
 	function(session, results) {
@@ -151,8 +152,13 @@ bot.dialog('/gatherProfileInfo', [
 		profileInfo[session.message.user.id]["infoGathered"] = "true";
 		//saveUserInfo(profileInfo[session.message.user.id])
 		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
+		bot.beginDialog(profileInfo[session.message.user.id]["address"], '/notify');
 	}
-])
+]);
+
+bot.dialog('/notify', function (session) {
+   session.endDialog("I'm sending you a proactive message!");
+});
 
 //Save userinfo in SQL DB
 function saveUserInfo(profileInfo) {
