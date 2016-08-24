@@ -55,13 +55,9 @@ var connector = new builder.ChatConnector(botConnectorOptions);
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-//Sends a proactive message to end users to participate in a survey
 server.get('/proactivesurvey', function respond(req, res, next) {
-	var filteredUsers = filterUsers(profileInfo)
-	for(var i=0; i < filteredUsers.length; i++ ) {
-		bot.beginDialog(filteredUsers[i].address, '/notify');
-	}
-	res.send('Sent survey requests to end users'+ JSON.stringify(filteredUsers));
+	bot.beginDialog(address, '/notify');
+	res.send('hello ');
 })
 
 //=========================================================
@@ -169,17 +165,6 @@ bot.dialog('/gatherProfileInfo', [
 bot.dialog('/notify', function (session) {
    session.endDialog("I'm sending you a proactive message!");
 });
-
-//=========================================================
-// User Functions
-//=========================================================
-
-/**
-Returns list of end users after filtering
-**/
-function filterUsers(profileInfo) {
-	return profileInfo
-}
 
 //Save userinfo in SQL DB
 function saveUserInfo(profileInfo) {
