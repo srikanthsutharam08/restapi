@@ -184,7 +184,7 @@ bot.dialog('/notify', [
 			profileQtObj = surveydata;
 			session.beginDialog('/survey');
 		} else {
-			session.send("Thank You for your time :)");
+			session.endDialog("Thank You for your time :)");
 		}
 	}
 ]);
