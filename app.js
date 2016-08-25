@@ -54,7 +54,7 @@ var connector = new builder.ChatConnector(botConnectorOptions);
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-server.get('/pushsurvey', function respond(req, res, next) {
+server.post('/pushsurvey', function respond(req, res, next) {
 	var filteredUsers = filterUsers(profileInfo)
 	//var filteredUsers = {"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI":{"user_id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB","address":{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"},"age":26,"gender":"Male","maritalstatus":"false","email":"asdf","city":"asdf","infoGathered":"true"}}
  	for (var key in filteredUsers) {
@@ -63,7 +63,7 @@ server.get('/pushsurvey', function respond(req, res, next) {
 			bot.beginDialog(filteredUsers[key].address, '/notify');
 		}
 	}
- 	res.send('Sent survey requests to end users');
+ 	res.send('Sent survey requests to end users::'+req.params);
 })
 
 //=========================================================
