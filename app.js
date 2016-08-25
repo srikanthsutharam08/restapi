@@ -45,7 +45,6 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 
 var profileInfo = {}
-var address = {"id":"t0cSRkzEbuceIiW","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":true}
 // Create chat bot
 var botConnectorOptions = { 
     appId: process.env.BOTFRAMEWORK_APPID, 
@@ -55,7 +54,7 @@ var connector = new builder.ChatConnector(botConnectorOptions);
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
-server.get('/proactivesurvey', function respond(req, res, next) {
+server.get('/pushsurvey', function respond(req, res, next) {
 	var filteredUsers = filterUsers(profileInfo)
 	//var filteredUsers = {"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI":{"user_id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB","address":{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"},"age":26,"gender":"Male","maritalstatus":"false","email":"asdf","city":"asdf","infoGathered":"true"}}
  	for (var key in filteredUsers) {
@@ -108,8 +107,7 @@ bot.on('contactRelationUpdate', function (message) {
 		var reply = new builder.Message()
                 .address(message.address)
                 .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
-        //bot.send(reply);
-		bot.beginDialog(message.user.address, '/')
+        bot.send(reply);
     } else {
         //deleteProfileInfo(message.user.id)
 		deleteUserInfo(message.user.id)
