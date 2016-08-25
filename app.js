@@ -63,7 +63,7 @@ server.post('/pushsurvey', function respond(req, res, next) {
 			bot.beginDialog(filteredUsers[key].address, '/notify');
 		}
 	}
- 	res.send('Sent survey requests to end users::'+req.params);
+ 	res.send('Sent survey requests to end users::'+req.body);
 })
 
 //=========================================================
