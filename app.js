@@ -48,6 +48,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 var profileInfo = {}
 var surveydata = null
+var profileQtObj;
 // Create chat bot
 var botConnectorOptions = { 
     appId: process.env.BOTFRAMEWORK_APPID, 
@@ -172,13 +173,72 @@ bot.dialog('/gatherProfileInfo', [
 ]);
 
 
-bot.dialog('/notify', function (session) {
-   session.endDialog("I'm sending you a proactive message!");
-});
+bot.dialog('/notify', [
+	function(session) {
+		builder.Prompts.confirm(session, "We have a new Profile Survey.Do you want to participate?");
+	},
+	function (session, results) {
+		if(results.response){
+			session.userData.questionId = 0;
+			session.userData.response = [];
+			profileQtObj = surveydata;
+			session.beginDialog('/survey');
+		} else {
+			session.send("Thank You for your time");
+		}
+	}
+]);
+
+bot.dialog('/survey', [
+    function (session) {
+        if (!session.userData.questionId) {
+            session.userData.questionId = 0;
+        } 
+        if (session.userData.questionId < profileQtObj.survey.length) {
+            askQuestion(session);
+        } else {
+            var txt = ""; 
+            //Or save the backing store..
+            session.userData.response.forEach(function(response) {
+                txt += "\n\n";
+                txt += "---\n\n";
+                txt += "**Question : " + profileQtObj.survey[response.questionId].question + "**";
+                txt += "\n\n";
+                if(profileQtObj.survey[response.questionId].type == 'multi') {
+                    txt += " Answer : " + response.result.entity;
+                } else {
+                    txt += " Answer : " + response.result;
+                }
+                txt += "\n\n";   
+            }, this);
+            var name = session.userData.name;
+            session.userData = null;
+            var endMsg = "Thank you " + name + " :-), for your time and patience. Your responses : " + txt;
+            session.endDialog(endMsg);
+        }
+    },
+    function (session, results) {        
+        if(!session.userData.response) {
+            session.userData.response = [];
+        }
+        session.userData.response.push({questionId : session.userData.questionId, result: results.response});
+        session.userData.questionId = session.userData.questionId + 1;
+        session.replaceDialog('/survey');
+    }
+]);
 
 //=========================================================
 // User Functions
 //=========================================================
+
+function askQuestion(session) {
+    var index = session.userData.questionId;
+    if(profileQtObj.survey[index].type === 'multi') {
+        builder.Prompts.choice(session, profileQtObj.survey[index].question, profileQtObj.survey[index].choices);
+    } else if (profileQtObj.survey[index].type === 'bool') {
+        builder.Prompts.confirm(session, profileQtObj.survey[index].question);
+    }
+}
 
 /**
 Returns list of end users after filtering
