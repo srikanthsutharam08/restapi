@@ -184,7 +184,7 @@ bot.dialog('/notify', [
 			profileQtObj = surveydata;
 			session.beginDialog('/survey');
 		} else {
-			session.send("Thank You for your time");
+			session.send("Thank You for your time :)");
 		}
 	}
 ]);
@@ -237,6 +237,8 @@ function askQuestion(session) {
         builder.Prompts.choice(session, profileQtObj.survey[index].question, profileQtObj.survey[index].choices);
     } else if (profileQtObj.survey[index].type === 'bool') {
         builder.Prompts.confirm(session, profileQtObj.survey[index].question);
+    } else if (profileQtObj.survey[index].type === 'text') {
+        builder.Prompts.text(session, profileQtObj.survey[index].question);
     }
 }
 
