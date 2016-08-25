@@ -40,6 +40,8 @@ connection.connect();
 
 // Setup Restify Server
 var server = restify.createServer();
+server.use(restify.bodyParser());
+server.use(restify.jsonp());
 server.listen(process.env.port || process.env.PORT || 3978, function () {
    console.log('%s listening to %s', server.name, server.url); 
 });
@@ -63,7 +65,7 @@ server.post('/pushsurvey', function respond(req, res, next) {
 			bot.beginDialog(filteredUsers[key].address, '/notify');
 		}
 	}
- 	res.send('Sent survey requests to end users::'+JSON.stringify(req));
+ 	res.send('Sent survey requests to end users::'+req.body);
 })
 
 //=========================================================
