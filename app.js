@@ -211,7 +211,6 @@ bot.dialog('/survey', [
                 }
                 txt += "\n\n";   
             }, this);
-            var name = session.userData.name;
             session.userData = null;
             var endMsg = "Thank you for your time and patience. Your survey response : " + txt;
             session.endDialog(endMsg);
