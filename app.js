@@ -110,13 +110,13 @@ bot.dialog('/profileInfo', [
 		builder.Prompts.text(session, "Please enter your email id?");
 	}, 
     function (session, results) {
-		profileInfo[session.message.user.id]["email"] = results.response;
+		profileInfo[session.message.user.id]["email"] = encodeURI(results.response);
 		builder.Prompts.text(session, "What is your current residing city?");
 	},
 	function (session, results) {
 		profileInfo[session.message.user.id]["city"] = results.response; 
 		profileInfo[session.message.user.id]["infoGathered"] = "true";
-		//saveUserInfo(profileInfo[session.message.user.id])
+		//saveProfileInfo(profileInfo[session.message.user.id])
 		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
 	}
 ]);
@@ -189,6 +189,22 @@ function askQuestion(session) {
         builder.Prompts.text(session, profileQtObj.survey[index].question);
     }
 }
+
+/**
+Sends profile Information to Server.
+**/
+function saveProfileInfo(profileInfo){
+	console.log("Pushing profile information back to server");
+	var args = {
+		parameters: { user_id: profileInfo["user_id"], user_name: profileInfo["name"], age: profileInfo["age"], gender : profileInfo["gender"], status: profileInfo["maritalstatus"], emailAddress: profileInfo["email"] },
+		headers: { "Content-Type": "application/x-www-form-urlencoded" }
+	};
+	//direct way 
+	client.post("http://localhost:9090/StudentEnrollmentWithREST/webapi/studentResource/saveinfo",args, function (data, response) {
+		//console.log(response);
+	});
+}
+
 
 /**
 Returns list of end users after filtering
