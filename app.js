@@ -1,18 +1,5 @@
 var restify = require("restify");
 var builder = require("botbuilder");
-var mysql = require('mysql');
-var tedious = require('tedious')
-
-//-----------------
-// Azure mysql DB
-//-----------------
-var connection = mysql.createConnection({
-  host     : 'us-cdbr-azure-west-c.cloudapp.net',
-  user     : 'b53b72110e4c63',
-  password : '38210b5d',
-  database : 'acsm_b33ab7b73a67497'
-});
-connection.connect();
 
 //=========================================================
 // Bot Setup
@@ -48,7 +35,7 @@ server.post('/pushsurvey', function respond(req, res, next) {
 		}
 	}
  	res.send('Sent survey requests to end users::'+JSON.stringify(req.body));
-})
+});
 
 //=========================================================
 // Activity Events
@@ -86,15 +73,14 @@ bot.on('conversationUpdate', function (message) {
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
         bot.beginDialog(message.address, '/profileInfo');
-	console.log("Inside adding as new contact");
     } else {
-	deleteUserInfo(message.user.id)
+        //deleteProfileInfo(message.user.id)
     }
 });
 
 
 // Bot Dialogs
-/**bot.dialog('/', [
+bot.dialog('/', [
 	function(session) {
 		session.beginDialog('/profileInfo')
     }
@@ -114,11 +100,10 @@ bot.dialog('/profileInfo', [
 			}
 		}
 	}
-])**/
+])
 
-bot.dialog('/profileInfo', [
+bot.dialog('/gatherProfileInfo', [
 	function(session) {
-		var user_id = session.message.user.id
 		profileInfo[session.message.user.id]["address"] = session.message.address; 
 		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. <br> What is your age?');
 	},
@@ -141,6 +126,7 @@ bot.dialog('/profileInfo', [
 	function (session, results) {
 		profileInfo[session.message.user.id]["city"] = results.response; 
 		profileInfo[session.message.user.id]["infoGathered"] = "true";
+		//saveUserInfo(profileInfo[session.message.user.id])
 		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
 	}
 ]);
