@@ -72,19 +72,12 @@ bot.on('conversationUpdate', function (message) {
 
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
-        bot.beginDialog(message.address, '/profileInfo');
+        bot.beginDialog('/profileInfo');
     } else {
         //deleteProfileInfo(message.user.id)
     }
 });
 
-
-// Bot Dialogs
-bot.dialog('/', [
-	function(session) {
-		session.beginDialog('/profileInfo')
-    }
-]);
 
 bot.dialog('/profileInfo', [
 	function(session) {
