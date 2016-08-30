@@ -73,7 +73,7 @@ bot.on('conversationUpdate', function (message) {
 
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
-        bot.beginDialog(message.address, '/profileInfo');
+		bot.beginDialog(message.address, '/profileInfo');
     } else {
         //deleteProfileInfo(message.user.id)
     }
@@ -90,9 +90,10 @@ bot.dialog('/', [
 
 bot.dialog('/profileInfo', [
 	function(session) {
-		var profileInfo = {}
-		profileInfo[session.message.user.id]["user_id"] = session.message.user.id
-		profileInfo[session.message.user.id]["name"] = session.message.user ? session.message.user.name : null;
+		if(!profileInfo[session.message.user.id]) {
+			var name = session.message.user ? session.message.user.name : null
+			profileInfo[session.message.user.id] = {"user_id": session.message.user.id, "name":name}
+		}
 		profileInfo[session.message.user.id]["address"] = session.message.address; 
 		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?');
 	},
