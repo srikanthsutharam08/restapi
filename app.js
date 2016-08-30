@@ -76,10 +76,7 @@ bot.on('contactRelationUpdate', function (message) {
         var name = message.user ? message.user.name : null;
 		var user_id = message.user.id
 		profileInfo[user_id] = {"user_id": user_id, "name":name}
-		var reply = new builder.Message()
-                .address(message.address)
-                .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
-        bot.beginDialog(message.address, '/profileInfo');
+		bot.beginDialog(message.address, '/profileInfo');
     } else {
         //deleteProfileInfo(message.user.id)
     }
@@ -112,7 +109,7 @@ bot.dialog('/profileInfo', [
 bot.dialog('/gatherProfileInfo', [
 	function(session) {
 		profileInfo[session.message.user.id]["address"] = session.message.address; 
-		builder.Prompts.number(session, 'What is your age?');
+		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. \n What is your age?');
 	},
 	function(session, results) {
 		profileInfo[session.message.user.id]["age"] = results.response;
