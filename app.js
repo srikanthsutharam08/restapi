@@ -73,7 +73,7 @@ bot.on('conversationUpdate', function (message) {
 
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
-        bot.beginDialog('/profileInfo');
+        bot.beginDialog(session, '/profileInfo');
     } else {
         //deleteProfileInfo(message.user.id)
     }
