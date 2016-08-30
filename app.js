@@ -85,22 +85,16 @@ bot.on('conversationUpdate', function (message) {
 
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
-        var name = message.user ? message.user.name : null;
-		var user_id = message.user.id
-		profileInfo[user_id] = {"user_id": user_id, "name":name}
-		var reply = new builder.Message()
-                .address(message.address)
-                .text("Hello %s... Thanks for adding me into your contacts.Say something to Continue.", name || 'there');
-        bot.send(reply);
+        bot.beginDialog(message.address, '/profileInfo');
+	console.log("Inside adding as new contact");
     } else {
-        //deleteProfileInfo(message.user.id)
-		deleteUserInfo(message.user.id)
+	deleteUserInfo(message.user.id)
     }
 });
 
 
 // Bot Dialogs
-bot.dialog('/', [
+/**bot.dialog('/', [
 	function(session) {
 		session.beginDialog('/profileInfo')
     }
@@ -120,12 +114,13 @@ bot.dialog('/profileInfo', [
 			}
 		}
 	}
-])
+])**/
 
-bot.dialog('/gatherProfileInfo', [
+bot.dialog('/profileInfo', [
 	function(session) {
+		var user_id = session.message.user.id
 		profileInfo[session.message.user.id]["address"] = session.message.address; 
-		builder.Prompts.number(session, 'What is your age?');
+		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. <br> What is your age?');
 	},
 	function(session, results) {
 		profileInfo[session.message.user.id]["age"] = results.response;
@@ -146,7 +141,6 @@ bot.dialog('/gatherProfileInfo', [
 	function (session, results) {
 		profileInfo[session.message.user.id]["city"] = results.response; 
 		profileInfo[session.message.user.id]["infoGathered"] = "true";
-		//saveUserInfo(profileInfo[session.message.user.id])
 		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
 	}
 ]);
