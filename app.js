@@ -1,5 +1,6 @@
 var restify = require("restify");
 var builder = require("botbuilder");
+var urlencode = require('urlencode');
 
 //=========================================================
 // Bot Setup
@@ -110,7 +111,7 @@ bot.dialog('/profileInfo', [
 		builder.Prompts.text(session, "Please enter your email id?");
 	}, 
     function (session, results) {
-		profileInfo[session.message.user.id]["email"] = encodeURI(results.response);
+		profileInfo[session.message.user.id]["email"] = urlencode(results.response)
 		builder.Prompts.text(session, "What is your current residing city?");
 	},
 	function (session, results) {
