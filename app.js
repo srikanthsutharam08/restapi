@@ -1,6 +1,5 @@
 var restify = require("restify");
 var builder = require("botbuilder");
-var mysql = require('mysql');
 var tedious = require('tedious')
 
 //-----------------
