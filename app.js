@@ -111,7 +111,7 @@ bot.on('contactRelationUpdate', function (message) {
 		profileInfo[user_id] = {"user_id": user_id, "name":name}
 		var reply = new builder.Message()
                 .address(message.address)
-                .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
+                .text("Hello %s... Thanks for adding me into your contacts.Say something to Continue.", name || 'there');
         bot.send(reply);
     } else {
         //deleteProfileInfo(message.user.id)
