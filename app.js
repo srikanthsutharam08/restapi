@@ -1,11 +1,22 @@
 var restify = require("restify");
 var builder = require("botbuilder");
+var mysql = require('mysql');
+var tedious = require('tedious')
 
+//-----------------
+// Azure mysql DB
+//-----------------
+var connection = mysql.createConnection({
+  host     : 'us-cdbr-azure-west-c.cloudapp.net',
+  user     : 'b53b72110e4c63',
+  password : '38210b5d',
+  database : 'acsm_b33ab7b73a67497'
+});
+connection.connect();
 
 //=========================================================
 // Bot Setup
 //=========================================================
-
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -37,7 +48,7 @@ server.post('/pushsurvey', function respond(req, res, next) {
 		}
 	}
  	res.send('Sent survey requests to end users::'+JSON.stringify(req.body));
-});
+})
 
 //=========================================================
 // Activity Events
@@ -74,20 +85,26 @@ bot.on('conversationUpdate', function (message) {
 
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
-        bot.beginDialog(session, '/profileInfo');
+        var name = message.user ? message.user.name : null;
+		var user_id = message.user.id
+		profileInfo[user_id] = {"user_id": user_id, "name":name}
+		var reply = new builder.Message()
+                .address(message.address)
+                .text("Hello %s... Thanks for adding me into your contacts.Say something to Continue.", name || 'there');
+        bot.send(reply);
     } else {
         //deleteProfileInfo(message.user.id)
+		deleteUserInfo(message.user.id)
     }
 });
 
 
 // Bot Dialogs
-/**bot.dialog('/', [
+bot.dialog('/', [
 	function(session) {
 		session.beginDialog('/profileInfo')
     }
 ]);
-
 
 bot.dialog('/profileInfo', [
 	function(session) {
@@ -103,15 +120,12 @@ bot.dialog('/profileInfo', [
 			}
 		}
 	}
-])**/
+])
 
-bot.dialog('/profileInfo', [
+bot.dialog('/gatherProfileInfo', [
 	function(session) {
-		var profileInfo = {};
-		profileInfo[session.message.user.id]["user_id"] = session.message.user.id; 
-		profileInfo[session.message.user.id]["name"] = session.message.name; 
 		profileInfo[session.message.user.id]["address"] = session.message.address; 
-		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. <br> What is your age??');
+		builder.Prompts.number(session, 'What is your age?');
 	},
 	function(session, results) {
 		profileInfo[session.message.user.id]["age"] = results.response;
