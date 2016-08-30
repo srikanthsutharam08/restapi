@@ -79,6 +79,14 @@ bot.on('contactRelationUpdate', function (message) {
 });
 
 
+// Bot Dialogs
+bot.dialog('/', [
+	function(session) {
+		session.beginDialog('/profileInfo')
+    }
+]);
+
+
 bot.dialog('/profileInfo', [
 	function(session) {
 		var user_id = session.message.user.id
