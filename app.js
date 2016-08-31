@@ -16,6 +16,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 var profileInfo = {}
 var surveydata = null
+var survey_data = {}
 var profileQtObj;
 // Create chat bot
 var botConnectorOptions = { 
@@ -27,15 +28,24 @@ var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
 server.post('/pushsurvey', function respond(req, res, next) {
-	var filteredUsers = filterUsers(profileInfo)
-	surveydata = req.body;
+	var inputsurveydata = req.body
+	var filteredUsers = inputsurveydata.users
+	//surveydata = req.body;
 	//var filteredUsers = {"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI":{"user_id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB","address":{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"},"age":26,"gender":"Male","maritalstatus":"false","email":"asdf","city":"asdf","infoGathered":"true"}}
- 	for (var key in filteredUsers) {
-		if (filteredUsers.hasOwnProperty(key)) {
-			console.log(key + " -> " + JSON.stringify(filteredUsers[key]));
-			bot.beginDialog(filteredUsers[key].address, '/notify');
-		}
+	if(filteredUsers && (filteredUsers.length > 0)) {
+		filteredUsers.forEach(function(address){
+			console.log(address.user.id);
+			var userId = address.user.id
+			if(!survey_data[userId]) {
+				survey_data[userId] = {}
+			}
+			survey_data[userId] = {"surveyId":inputsurveydata.surveyId, "proposer": inputsurveydata.proposer, "surveyname":inputsurveydata.surveyname,"surveyquestion": inputsurveydata.surveyquestion}
+			console.log("surveydata::"+JSON.stringify(survey_data) )
+			console.log("address::"+JSON.stringify(address) )
+			bot.beginDialog(address, '/notify');
+		});
 	}
+ 	
  	res.send('Sent survey requests to end users::'+JSON.stringify(req.body));
 });
 
@@ -129,9 +139,6 @@ bot.dialog('/notify', [
 	},
 	function (session, results) {
 		if(results.response){
-			session.userData.questionId = 0;
-			session.userData.response = [];
-			profileQtObj = surveydata;
 			session.beginDialog('/survey');
 		} else {
 			session.endDialog("Thank You for your time :)");
@@ -141,38 +148,10 @@ bot.dialog('/notify', [
 
 bot.dialog('/survey', [
     function (session) {
-        if (!session.userData.questionId) {
-            session.userData.questionId = 0;
-        } 
-        if (session.userData.questionId < profileQtObj.survey.length) {
-            askQuestion(session);
-        } else {
-            var txt = ""; 
-            //Or save the backing store..
-            session.userData.response.forEach(function(response) {
-                txt += "\n\n";
-                txt += "---\n\n";
-                txt += "**Question : " + profileQtObj.survey[response.questionId].question + "**";
-                txt += "\n\n";
-                if(profileQtObj.survey[response.questionId].type == 'multi') {
-                    txt += " Answer : " + response.result.entity;
-                } else {
-                    txt += " Answer : " + response.result;
-                }
-                txt += "\n\n";   
-            }, this);
-            session.userData = null;
-            var endMsg = "Thank you for your time and patience. Your survey response : " + txt;
-            session.endDialog(endMsg);
-        }
+		askQuestion(session);
     },
     function (session, results) {        
-        if(!session.userData.response) {
-            session.userData.response = [];
-        }
-        session.userData.response.push({questionId : session.userData.questionId, result: results.response});
-        session.userData.questionId = session.userData.questionId + 1;
-        session.replaceDialog('/survey');
+        session.endDialog("Response::"+ JSON.stringify(results.response.entity));
     }
 ]);
 
@@ -181,13 +160,13 @@ bot.dialog('/survey', [
 //=========================================================
 
 function askQuestion(session) {
-    var index = session.userData.questionId;
-    if(profileQtObj.survey[index].type === 'multi') {
-        builder.Prompts.choice(session, profileQtObj.survey[index].question, profileQtObj.survey[index].choices);
-    } else if (profileQtObj.survey[index].type === 'bool') {
-        builder.Prompts.confirm(session, profileQtObj.survey[index].question);
-    } else if (profileQtObj.survey[index].type === 'text') {
-        builder.Prompts.text(session, profileQtObj.survey[index].question);
+	var surveyQuestion = survey_data[session.message.user.id]["surveyquestion"]
+    if(surveyQuestion.type === 'multi') {
+        builder.Prompts.choice(session, surveyQuestion.question, surveyQuestion.choices);
+    } else if (surveyQuestion.type === 'bool') {
+        builder.Prompts.confirm(session, surveyQuestion.question);
+    } else if (surveyQuestion.type === 'text') {
+        builder.Prompts.text(session, surveyQuestion.question);
     }
 }
 
