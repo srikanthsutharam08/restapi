@@ -94,8 +94,8 @@ bot.on('contactRelationUpdate', function (message) {
 // Bot Dialogs
 bot.dialog('/', [
 	function(session) {
-		//session.beginDialog('/profileInfo')
-		session.send("Hiii.....")
+		session.beginDialog('/profileInfo')
+		//session.send("Hiii.....")
     }
 ]);
 
@@ -135,7 +135,8 @@ bot.dialog('/profileInfo', [
 
 bot.dialog('/notify', [
 	function(session) {
-		builder.Prompts.confirm(session, "We have a new Profile Survey.Do you want to participate?");
+		builder.Prompts.confirm(session, "Hii, We have a new "+ survey_data[session.message.user.id]["surveyname"] +
+					" Survey conducted by "+ survey_data[session.message.user.id]["proposer"] +".Do you want to participate?");
 	},
 	function (session, results) {
 		if(results.response){
