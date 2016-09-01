@@ -98,33 +98,34 @@ bot.dialog('/', [
 
 bot.dialog('/profileInfo', [
 	function(session) {
-		session.privateConversationData.userId = session.message.user.id
-		var name = session.message.user ? session.message.user.name : null
-		session.privateConversationData.name = session.message.user.id
-		session.privateConversationData.address = session.message.address
+		if(!profileInfo[session.message.user.id]) {
+			var name = session.message.user ? session.message.user.name : null
+			profileInfo[session.message.user.id] = {"user_id": session.message.user.id, "name":name}
+		}
+		profileInfo[session.message.user.id]["address"] = session.message.address; 
 		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?');
 	},
 	function(session, results) {
-		session.privateConversationData.age = results.response;
+		profileInfo[session.message.user.id]["age"] = results.response;
 		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
     },
     function(session, results) {
-		session.privateConversationData.gender = results.response.entity;
+		profileInfo[session.message.user.id]["gender"] = results.response.entity;
 		builder.Prompts.confirm(session, "Are you Married?");   
 	}, 
     function (session, results) {
-		session.privateConversationData.maritalstatus = results.response;
+		profileInfo[session.message.user.id]["maritalstatus"] = results.response;
 		builder.Prompts.text(session, "Please enter your email id?");
 	}, 
     function (session, results) {
-		session.privateConversationData.email = urlencode(results.response);
+		profileInfo[session.message.user.id]["email"] = urlencode(results.response)
 		builder.Prompts.text(session, "What is your current residing city?");
 	},
 	function (session, results) {
-		session.privateConversationData.city = results.response;
-		session.privateConversationData.infoGathered = "true";
+		profileInfo[session.message.user.id]["city"] = results.response; 
+		profileInfo[session.message.user.id]["infoGathered"] = "true";
 		//saveProfileInfo(profileInfo[session.message.user.id])
-		session.endDialog(JSON.stringify(session.privateConversationData));
+		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
 	}
 ]);
 
