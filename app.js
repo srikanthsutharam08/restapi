@@ -139,7 +139,9 @@ bot.dialog('/notify', [
 					" Survey conducted by "+ survey_data[session.message.user.id]["proposer"] +".Do you want to participate?");
 	},
 	function (session, results) {
+		console.log("results.response::"+ results.response);
 		if(results.response){
+			console.log("inside if");
 			session.beginDialog('/survey');
 		} else {
 			session.endDialog("Thank You for your time :)");
