@@ -31,17 +31,14 @@ server.post('/pushsurvey', function respond(req, res, next) {
 	var inputsurveydata = req.body
 	var filteredUsers = inputsurveydata.users
 	//surveydata = req.body;
-	//var filteredUsers = {"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI":{"user_id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB","address":{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"},"age":26,"gender":"Male","maritalstatus":"false","email":"asdf","city":"asdf","infoGathered":"true"}}
+	//var filteredUsers = [{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"}]
 	if(filteredUsers && (filteredUsers.length > 0)) {
 		filteredUsers.forEach(function(address){
-			console.log(address.user.id);
 			var userId = address.user.id
 			if(!survey_data[userId]) {
 				survey_data[userId] = {}
 			}
 			survey_data[userId] = {"surveyId":inputsurveydata.surveyId, "proposer": inputsurveydata.proposer, "surveyname":inputsurveydata.surveyname,"surveyquestion": inputsurveydata.surveyquestion}
-			console.log("surveydata::"+JSON.stringify(survey_data) )
-			console.log("address::"+JSON.stringify(address) )
 			bot.beginDialog(address, '/notify');
 		});
 	}
@@ -101,34 +98,33 @@ bot.dialog('/', [
 
 bot.dialog('/profileInfo', [
 	function(session) {
-		if(!profileInfo[session.message.user.id]) {
-			var name = session.message.user ? session.message.user.name : null
-			profileInfo[session.message.user.id] = {"user_id": session.message.user.id, "name":name}
-		}
-		profileInfo[session.message.user.id]["address"] = session.message.address; 
+		session.privateConversationData.userId = session.message.user.id
+		var name = session.message.user ? session.message.user.name : null
+		session.privateConversationData.name = session.message.user.id
+		session.privateConversationData.address = session.message.address
 		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?');
 	},
 	function(session, results) {
-		profileInfo[session.message.user.id]["age"] = results.response;
+		session.privateConversationData.age = results.response;
 		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
     },
     function(session, results) {
-		profileInfo[session.message.user.id]["gender"] = results.response.entity;
+		session.privateConversationData.gender = results.response.entity;
 		builder.Prompts.confirm(session, "Are you Married?");   
 	}, 
     function (session, results) {
-		profileInfo[session.message.user.id]["maritalstatus"] = results.response;
+		session.privateConversationData.maritalstatus = results.response;
 		builder.Prompts.text(session, "Please enter your email id?");
 	}, 
     function (session, results) {
-		profileInfo[session.message.user.id]["email"] = urlencode(results.response)
+		session.privateConversationData.email = urlencode(results.response);
 		builder.Prompts.text(session, "What is your current residing city?");
 	},
 	function (session, results) {
-		profileInfo[session.message.user.id]["city"] = results.response; 
-		profileInfo[session.message.user.id]["infoGathered"] = "true";
+		session.privateConversationData.city = results.response;
+		session.privateConversationData.infoGathered = "true";
 		//saveProfileInfo(profileInfo[session.message.user.id])
-		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
+		session.endDialog(JSON.stringify(session.privateConversationData));
 	}
 ]);
 
