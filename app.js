@@ -34,11 +34,14 @@ server.post('/pushsurvey', function respond(req, res, next) {
 	//var filteredUsers = [{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"}]
 	if(filteredUsers && (filteredUsers.length > 0)) {
 		filteredUsers.forEach(function(address){
+			console.log(address.user.id);
 			var userId = address.user.id
 			if(!survey_data[userId]) {
 				survey_data[userId] = {}
 			}
 			survey_data[userId] = {"surveyId":inputsurveydata.surveyId, "proposer": inputsurveydata.proposer, "surveyname":inputsurveydata.surveyname,"surveyquestion": inputsurveydata.surveyquestion}
+			console.log("surveydata::"+JSON.stringify(survey_data) )
+			console.log("address::"+JSON.stringify(address) )
 			bot.beginDialog(address, '/notify');
 		});
 	}
