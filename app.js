@@ -149,7 +149,9 @@ bot.dialog('/notify', [
 
 bot.dialog('/survey', [
     function (session) {
+		console.log("before question");
 		askQuestion(session);
+		console.log("after question");
     },
     function (session, results) {        
         session.endDialog("Response::"+ JSON.stringify(results.response.entity));
@@ -161,7 +163,11 @@ bot.dialog('/survey', [
 //=========================================================
 
 function askQuestion(session) {
+	console.log("inside askQuestion");
+	console.log("userId:"+ JSON.stringify(survey_data[session.message.user.id]));
+	console.log("userId:"+ JSON.stringify(survey_data[session.message.user.id]["surveyquestion"]));
 	var surveyQuestion = survey_data[session.message.user.id]["surveyquestion"]
+	console.log("surveyQuestion::"+ surveyQuestion);
     if(surveyQuestion.type === 'multi') {
         builder.Prompts.choice(session, surveyQuestion.question, surveyQuestion.choices);
     } else if (surveyQuestion.type === 'bool') {
