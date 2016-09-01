@@ -34,14 +34,11 @@ server.post('/pushsurvey', function respond(req, res, next) {
 	//var filteredUsers = [{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"}]
 	if(filteredUsers && (filteredUsers.length > 0)) {
 		filteredUsers.forEach(function(address){
-			console.log(address.user.id);
 			var userId = address.user.id
 			if(!survey_data[userId]) {
 				survey_data[userId] = {}
 			}
 			survey_data[userId] = {"surveyId":inputsurveydata.surveyId, "proposer": inputsurveydata.proposer, "surveyname":inputsurveydata.surveyname,"surveyquestion": inputsurveydata.surveyquestion}
-			console.log("surveydata::"+JSON.stringify(survey_data) )
-			console.log("address::"+JSON.stringify(address) )
 			bot.beginDialog(address, '/notify');
 		});
 	}
@@ -101,34 +98,33 @@ bot.dialog('/', [
 
 bot.dialog('/profileInfo', [
 	function(session) {
-		if(!profileInfo[session.message.user.id]) {
-			var name = session.message.user ? session.message.user.name : null
-			profileInfo[session.message.user.id] = {"user_id": session.message.user.id, "name":name}
-		}
-		profileInfo[session.message.user.id]["address"] = session.message.address; 
+		session.privateConversationData.userId = session.message.user.id
+		var name = session.message.user ? session.message.user.name : null
+		session.privateConversationData.name = session.message.user.id
+		session.privateConversationData.address = session.message.address
 		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?');
 	},
 	function(session, results) {
-		profileInfo[session.message.user.id]["age"] = results.response;
+		session.privateConversationData.age = results.response;
 		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
     },
     function(session, results) {
-		profileInfo[session.message.user.id]["gender"] = results.response.entity;
+		session.privateConversationData.gender = results.response.entity;
 		builder.Prompts.confirm(session, "Are you Married?");   
 	}, 
     function (session, results) {
-		profileInfo[session.message.user.id]["maritalstatus"] = results.response;
+		session.privateConversationData.maritalstatus = results.response;
 		builder.Prompts.text(session, "Please enter your email id?");
 	}, 
     function (session, results) {
-		profileInfo[session.message.user.id]["email"] = urlencode(results.response)
+		session.privateConversationData.email = urlencode(results.response);
 		builder.Prompts.text(session, "What is your current residing city?");
 	},
 	function (session, results) {
-		profileInfo[session.message.user.id]["city"] = results.response; 
-		profileInfo[session.message.user.id]["infoGathered"] = "true";
+		session.privateConversationData.city = results.response;
+		session.privateConversationData.infoGathered = "true";
 		//saveProfileInfo(profileInfo[session.message.user.id])
-		session.endDialog(JSON.stringify(profileInfo[session.message.user.id]));
+		session.endDialog(JSON.stringify(session.privateConversationData));
 	}
 ]);
 
@@ -138,10 +134,8 @@ bot.dialog('/notify', [
 		builder.Prompts.confirm(session, "Hii, We have a new "+ survey_data[session.message.user.id]["surveyname"] +
 					" Survey conducted by "+ survey_data[session.message.user.id]["proposer"] +".Do you want to participate?");
 	},
-	function (session, results) {
-		console.log("results.response::"+ results.response);
+	function(session, results) {
 		if(results.response){
-			console.log("inside if");
 			session.beginDialog('/survey');
 		} else {
 			session.endDialog("Thank You for your time :)");
@@ -151,9 +145,7 @@ bot.dialog('/notify', [
 
 bot.dialog('/survey', [
     function (session) {
-		console.log("before question");
 		askQuestion(session);
-		console.log("after question");
     },
     function (session, results) {        
         session.endDialog("Response::"+ JSON.stringify(results.response.entity));
@@ -165,12 +157,8 @@ bot.dialog('/survey', [
 //=========================================================
 
 function askQuestion(session) {
-	console.log("inside askQuestion");
-	console.log("userId:"+ JSON.stringify(survey_data[session.message.user.id]));
-	console.log("userId:"+ JSON.stringify(survey_data[session.message.user.id]["surveyquestion"]));
 	var surveyQuestion = survey_data[session.message.user.id]["surveyquestion"]
-	console.log("surveyQuestion::"+ surveyQuestion);
-    if(surveyQuestion.type === 'multi') {
+	if(surveyQuestion.type === 'multi') {
         builder.Prompts.choice(session, surveyQuestion.question, surveyQuestion.choices);
     } else if (surveyQuestion.type === 'bool') {
         builder.Prompts.confirm(session, surveyQuestion.question);
