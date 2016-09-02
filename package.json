@@ -11,6 +11,7 @@
     "sequelize": "^3.24.1",
     "skype-sdk": "^1.0.6",
     "tedious": "^1.14.0",
+    "urlencode": "^1.1.0",
     "util": "^0.10.3"
   },
   "devDependencies": {},
