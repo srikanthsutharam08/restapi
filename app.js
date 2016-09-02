@@ -30,10 +30,10 @@ server.post('/api/messages', connector.listen());
 server.post('/pushsurvey', function respond(req, res, next) {
 	var inputsurveydata = req.body
 	var filteredUsers = inputsurveydata.users
-	var filteredUsers = [{"id":"d2b794f47f8f41aeb6f659bf1cfbee3a","channelId":"emulator","user":{"id":"617d3bf8","name":"User1"},"conversation":{"isGroup":false,"id":"1cf91be5","name":"Conv1"},"bot":{"id":"5e4f5dfa","name":"Bot1"},"serviceUrl":"http://localhost:9000","useAuth":false}]
+	//var filteredUsers = [{"id":"d2b794f47f8f41aeb6f659bf1cfbee3a","channelId":"emulator","user":{"id":"617d3bf8","name":"User1"},"conversation":{"isGroup":false,"id":"1cf91be5","name":"Conv1"},"bot":{"id":"5e4f5dfa","name":"Bot1"},"serviceUrl":"http://localhost:9000","useAuth":false}]
 
 
-//[{"id":"JVuBqSefc9x","channelId":"skype","user":{"id":"29:1vUMyT4wHzcOL4Y-HjK84ehrKSYjtrqgC6Fr-809jV24","name":"Jayaram Reddy Y"},"conversation":{"id":"29:1vUMyT4wHzcOL4Y-//HjK84ehrKSYjtrqgC6Fr-809jV24"},"bot":{"id":"28:c1bb3e1e-5cbd-4204-8e2c-2b45b569910a","name":"fissionmrbot"},"serviceUrl":"https://skype.botframework.com","useAuth":true}]
+var filteredUsers = [{"id":"JVuBqSefc9x","channelId":"skype","user":{"id":"29:1vUMyT4wHzcOL4Y-HjK84ehrKSYjtrqgC6Fr-809jV24","name":"Jayaram Reddy Y"},"conversation":{"id":"29:1vUMyT4wHzcOL4Y-//HjK84ehrKSYjtrqgC6Fr-809jV24"},"bot":{"id":"28:c1bb3e1e-5cbd-4204-8e2c-2b45b569910a","name":"fissionmrbot"},"serviceUrl":"https://skype.botframework.com","useAuth":true}]
 
 	if(filteredUsers && (filteredUsers.length > 0)) {
 		filteredUsers.forEach(function(address){
