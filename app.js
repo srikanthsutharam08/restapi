@@ -61,7 +61,6 @@ server.post('/api/messages', connector.listen());
 server.post('/pushsurvey', function respond(req, res, next) {
 	var filteredUsers = filterUsers(profileInfo)
 	surveydata = req.body;
-	//var filteredUsers = {"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI":{"user_id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB","address":{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"},"age":26,"gender":"Male","maritalstatus":"false","email":"asdf","city":"asdf","infoGathered":"true"}}
  	for (var key in filteredUsers) {
 		if (filteredUsers.hasOwnProperty(key)) {
 			console.log(key + " -> " + JSON.stringify(filteredUsers[key]));
@@ -111,10 +110,9 @@ bot.on('contactRelationUpdate', function (message) {
 		profileInfo[user_id] = {"user_id": user_id, "name":name}
 		var reply = new builder.Message()
                 .address(message.address)
-                .text("Hello %s... Thanks for adding me into your contacts.Say something.", name || 'there');
+                .text("Hello %s... Thanks for adding me into your contacts.Say something to Continue.", name || 'there');
         bot.send(reply);
     } else {
-        //deleteProfileInfo(message.user.id)
 		deleteUserInfo(message.user.id)
     }
 });
@@ -246,60 +244,4 @@ Returns list of end users after filtering
 **/
 function filterUsers(profileInfo) {
 	return profileInfo
-}
-
-//Save userinfo in SQL DB
-function saveUserInfo(profileInfo) {
- 	var post = {user_id:profileInfo["user_id"], user_name:profileInfo["name"], age:profileInfo["age"], gender:profileInfo["gender"], maritalstatus:profileInfo["maritalstatus"], city:profileInfo["city"]};	
- 	var query = connection.query('INSERT INTO userinfo SET ?', post, function(err, result) {
- 		if (err) 
- 			throw err;
- 	});
- 	console.log(query.sql);  
- 	connection.end();
-}
-
-//Delete userinfo in SQL DB
-function deleteUserInfo(user_id) {
- 	var post = {user_id:user_id};	
- 	var query = connection.query('delete from userinfo where ?', post, function(err, result) {
- 		if (err) 
- 			throw err;
- 	});
- 	console.log(query.sql);  
- 	connection.end();
-}
-
-//Save the userdata in SQL server DB
-function saveProfileInfo() {  
-    var request = new Request("INSERT into dbo.userinfo(user_id, user_name, age, gender, maritalstatus, city) values (@user_id, @name, @age, @gender, @maritalstatus, @city);", function(err) {  
-		if (err) {  
-			console.log(err);}  
-        });  
-		request.addParameter('user_id', TYPES.NVarChar, profileInfo["user_id"]);
-        request.addParameter('name', TYPES.NVarChar, profileInfo["name"]);
-		request.addParameter('age', TYPES.Int, profileInfo["age"]); 		
-        request.addParameter('gender', TYPES.NVarChar , profileInfo["gender"]);  
-		request.addParameter('maritalstatus', TYPES.Bit , profileInfo["maritalstatus"]);
-        request.addParameter('city', TYPES.NVarChar , profileInfo["city"]);  
-        request.on('row', function(columns) {  
-            columns.forEach(function(column) {  
-              if (column.value === null) {  
-                console.log('NULL');  
-              } else {  
-                console.log("user inserted is " + column.value); 
-              }  
-            });  
-        });       
-        connection.execSql(request);	
-}
-
-//Delete the userdata in SQL server DB
-function deleteProfileInfo(userId) {  
-    var request = new Request("delete from dbo.userinfo where user_id = @user_id;", function(err) {  
-		if (err) {  
-			console.log(err);}  
-        });  
-		request.addParameter('user_id', TYPES.NVarChar, userId);       
-        connection.execSql(request);	
 }
