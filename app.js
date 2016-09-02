@@ -120,7 +120,7 @@ bot.dialog('/profileInfo', [
 	function (session, results) {
 		session.privateConversationData.city = results.response;
 		session.privateConversationData.infoGathered = "true";
-		//saveProfileInfo(session.privateConversationData)
+		saveProfileInfo(session.privateConversationData)
 		session.endDialog(JSON.stringify(session.privateConversationData));
 	}
 ]);
