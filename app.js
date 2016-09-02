@@ -14,8 +14,6 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
    console.log('%s listening to %s', server.name, server.url); 
 });
 
-var profileInfo = {}
-var surveydata = null
 var survey_data = {}
 var profileQtObj;
 // Create chat bot
@@ -30,7 +28,6 @@ server.post('/api/messages', connector.listen());
 server.post('/pushsurvey', function respond(req, res, next) {
 	var inputsurveydata = req.body
 	var filteredUsers = inputsurveydata.users
-	//surveydata = req.body;
 	//var filteredUsers = [{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"}]
 	if(filteredUsers && (filteredUsers.length > 0)) {
 		filteredUsers.forEach(function(address){
@@ -123,7 +120,7 @@ bot.dialog('/profileInfo', [
 	function (session, results) {
 		session.privateConversationData.city = results.response;
 		session.privateConversationData.infoGathered = "true";
-		//saveProfileInfo(profileInfo[session.message.user.id])
+		//saveProfileInfo(session.privateConversationData)
 		session.endDialog(JSON.stringify(session.privateConversationData));
 	}
 ]);
@@ -147,8 +144,8 @@ bot.dialog('/survey', [
     function (session) {
 		askQuestion(session);
     },
-    function (session, results) {        
-        session.endDialog("Response::"+ JSON.stringify(results.response.entity));
+    function (session, results) {
+		session.endDialog("Response::"+ JSON.stringify(results.response.entity));
     }
 ]);
 
@@ -173,7 +170,7 @@ Sends profile Information to Server.
 function saveProfileInfo(profileInfo){
 	console.log("Pushing profile information back to server");
 	var args = {
-		parameters: { user_id: profileInfo["user_id"], user_name: profileInfo["name"], age: profileInfo["age"], gender : profileInfo["gender"], status: profileInfo["maritalstatus"], emailAddress: profileInfo["email"] },
+		parameters: { userId: profileInfo["userId"], userName: profileInfo["name"], address: profileInfo["address"], age: profileInfo["age"], gender : profileInfo["gender"], maritalstatus: profileInfo["maritalstatus"], email: profileInfo["email"], city: profileInfo["city"], infoGathered: profileInfo["infoGathered"] },
 		headers: { "Content-Type": "application/x-www-form-urlencoded" }
 	};
 	//direct way 
