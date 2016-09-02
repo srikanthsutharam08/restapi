@@ -14,26 +14,6 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
-//----------------------
-//Connect to Azure sql server database
-//----------------------
-//var Connection = require('tedious').Connection;
-//var Request = require('tedious').Request;  
-//var TYPES = require('tedious').TYPES;
-//var config = {  
-//        userName: 'srikanthsutharam08',  
-//        password: 'SbsUrrTai@#345',  
-//       server: 'botdbserver.database.windows.net',  
-//        // When you connect to Azure SQL Database, you need these next options.  
-//        options: {encrypt: true, database: 'botdb'}  
-//    };  
-//var connection = new Connection(config);  
-//connection.on('connect', function(err) {  
-    // If no error, then good to proceed.  
-//    console.log("Connected");
-//});
-//----------------------
-
 //=========================================================
 // Bot Setup
 //=========================================================
