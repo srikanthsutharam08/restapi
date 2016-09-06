@@ -104,7 +104,7 @@ bot.dialog('/profileInfo', [
 		var name = session.message.user ? session.message.user.name : null
 		session.privateConversationData.name = name
 		session.privateConversationData.address = session.message.address
-		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?');
+		builder.Prompts.number(session, 'Hello %s... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?', name);
 	},
 	function(session, results) {
 		session.privateConversationData.age = results.response;
