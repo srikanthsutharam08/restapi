@@ -1,6 +1,10 @@
 var restify = require("restify");
 var builder = require("botbuilder");
 var urlencode = require('urlencode');
+var Client = require('node-rest-client').Client;
+var client = new Client();
+var http = require("http");
+var url = require("url");
 
 //=========================================================
 // Bot Setup
@@ -28,7 +32,9 @@ server.post('/api/messages', connector.listen());
 server.post('/pushsurvey', function respond(req, res, next) {
 	var inputsurveydata = req.body
 	var filteredUsers = inputsurveydata.users
-	//var filteredUsers = [{"id":"t0cSRkzEeK4vITA","channelId":"skype","user":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI","name":"Srikanth SB"},"conversation":{"id":"29:1vYGBvog2ILNJLxVKn5X0V4DiT9SsUDaBIlmZyPChRQI"},"bot":{"id":"28:c0a89848-4286-43b8-9523-4cb07b6143a7","name":"restapibot"},"serviceUrl":"https://skype.botframework.com","useAuth":"true"}]
+//	var filteredUsers = [{"id":"d2b794f47f8f41aeb6f659bf1cfbee3a","channelId":"emulator","user":{"id":"617d3bf8","name":"User1"},"conversation":{"isGroup":false,"id":"1cf91be5","name":"Conv1"},"bot":{"id":"5e4f5dfa","name":"Bot1"},"serviceUrl":"http://localhost:9000","useAuth":false}]
+//var filteredUsers = [{"id":"JVuBqSefc9x","channelId":"skype","user":{"id":"29:1vUMyT4wHzcOL4Y-HjK84ehrKSYjtrqgC6Fr-809jV24","name":"Jayaram Reddy Y"},"conversation":{"id":"29:1vUMyT4wHzcOL4Y-//HjK84ehrKSYjtrqgC6Fr-809jV24"},"bot":{"id":"28:c1bb3e1e-5cbd-4204-8e2c-2b45b569910a","name":"fissionmrbot"},"serviceUrl":"https://skype.botframework.com","useAuth":true}]
+
 	if(filteredUsers && (filteredUsers.length > 0)) {
 		filteredUsers.forEach(function(address){
 			var userId = address.user.id
@@ -41,6 +47,13 @@ server.post('/pushsurvey', function respond(req, res, next) {
 	}
  	
  	res.send('Sent survey requests to end users::'+JSON.stringify(req.body));
+});
+
+// Local End Point on 3978 for survey testing purpose
+server.post('/getInputSurvey', function respond(req, res, next) {
+	var parsedUrl = url.parse(req.url, true); // true to get query as object
+	var queryAsObject = parsedUrl.query;
+	console.log("Input Arguments -->"+JSON.stringify(queryAsObject));
 });
 
 //=========================================================
@@ -78,7 +91,7 @@ bot.on('conversationUpdate', function (message) {
 
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
-		bot.beginDialog(message.address, '/profileInfo');
+		bot.beginDialog(message.address, '/getProfileInfo');
     } else {
         //deleteProfileInfo(message.user.id)
     }
@@ -88,39 +101,18 @@ bot.on('contactRelationUpdate', function (message) {
 // Bot Dialogs
 bot.dialog('/', [
 	function(session) {
-		session.beginDialog('/profileInfo')
-		//session.send("Hiii.....")
+		session.beginDialog('/getProfileInfo')
     }
 ]);
 
-bot.dialog('/profileInfo', [
+bot.dialog('/getProfileInfo', [
 	function(session) {
-		session.privateConversationData.userId = session.message.user.id
-		var name = session.message.user ? session.message.user.name : null
-		session.privateConversationData.name = session.message.user.id
-		session.privateConversationData.address = session.message.address
-		builder.Prompts.number(session, 'Hello... Thanks for adding me into your contacts. Please fill out the basic profile info. What is your age?');
-	},
-	function(session, results) {
-		session.privateConversationData.age = results.response;
-		builder.Prompts.choice(session, 'What is your Gender?', ["Male","Female","Other"]);
-    },
-    function(session, results) {
-		session.privateConversationData.gender = results.response.entity;
-		builder.Prompts.confirm(session, "Are you Married?");   
-	}, 
-    function (session, results) {
-		session.privateConversationData.maritalstatus = results.response;
-		builder.Prompts.text(session, "Please enter your email id?");
-	}, 
-    function (session, results) {
-		session.privateConversationData.email = urlencode(results.response);
-		builder.Prompts.text(session, "What is your current residing city?");
-	},
-	function (session, results) {
-		session.privateConversationData.city = results.response;
-		session.privateConversationData.infoGathered = "true";
-		//saveProfileInfo(session.privateConversationData)
+		session.privateConversationData.userId = session.message.user.id;
+		var name = session.message.user ? session.message.user.name : null;
+		session.privateConversationData.name = name;
+		session.privateConversationData.address = session.message.address;
+		session.send("Hello %s... Thanks for adding me into your contacts.", name);
+		getProfileSurvey(session.privateConversationData);
 		session.endDialog(JSON.stringify(session.privateConversationData));
 	}
 ]);
@@ -164,25 +156,14 @@ function askQuestion(session) {
     }
 }
 
-/**
-Sends profile Information to Server.
-**/
-function saveProfileInfo(profileInfo){
+function getProfileSurvey(profileInfo){
 	console.log("Pushing profile information back to server");
 	var args = {
-		parameters: { userId: profileInfo["userId"], userName: profileInfo["name"], address: profileInfo["address"], age: profileInfo["age"], gender : profileInfo["gender"], maritalstatus: profileInfo["maritalstatus"], email: profileInfo["email"], city: profileInfo["city"], infoGathered: profileInfo["infoGathered"] },
+		parameters: { userId: profileInfo["userId"], userName: profileInfo["name"], address: profileInfo["address"], addProfileInfo:true},
 		headers: { "Content-Type": "application/x-www-form-urlencoded" }
 	};
 	//direct way 
-	client.post("http://localhost:9090/StudentEnrollmentWithREST/webapi/studentResource/saveinfo",args, function (data, response) {
-		//console.log(response);
+	client.post("http://localhost:3978/getInputSurvey",args, function (data, response) {
+		console.log(response);
 	});
-}
-
-
-/**
-Returns list of end users after filtering
-**/
-function filterUsers(profileInfo) {
-	return profileInfo
 }
